@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.nii.gz -text
+atlas/sources/* -text
+atlas/labels.tsv -text -whitespace
+atlas/FSL_license_original.html -text -whitespace
+atlas/CC_BY_SA_4_legalcode.txt -text -whitespace

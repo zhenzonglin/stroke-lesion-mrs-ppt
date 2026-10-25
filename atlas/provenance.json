@@ -1,0 +1,68 @@
+{
+  "name": "Custom display atlas MNI9 plus HO brainstem",
+  "version": "20261025_v1",
+  "is_standard_unmodified_atlas": false,
+  "space": "FSL MNI152 2mm",
+  "bilateral_regions": true,
+  "construction": "Keep MNI structural maxprob thr25 labels 1-9; assign all HO subcortical maxprob thr25 Brain-Stem voxels to label10 with priority over MNI9. No interpolation.",
+  "overridden_MNI_voxels": {
+    "Caudate": 0,
+    "Cerebellum": 1030,
+    "Frontal Lobe": 0,
+    "Insula": 0,
+    "Occipital Lobe": 0,
+    "Parietal Lobe": 0,
+    "Putamen": 0,
+    "Temporal Lobe": 0,
+    "Thalamus": 3
+  },
+  "brainstem_voxels": 4890,
+  "shape": [
+    91,
+    109,
+    91
+  ],
+  "affine": [
+    [
+      -2.0,
+      0.0,
+      0.0,
+      90.0
+    ],
+    [
+      0.0,
+      2.0,
+      0.0,
+      -126.0
+    ],
+    [
+      0.0,
+      0.0,
+      2.0,
+      -72.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "atlas_sha256": "bcb8c54bf59c85296c6fea5cfdb04c3e698713e3c15038fe4289eb33b3d1bd51",
+  "labels_sha256": "63123303d1768f07348fcbfa8aff5dcae7cd62bee312f383dafdfa9b62396bbd",
+  "package_url": "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/noarch/fsl-data_atlases-2103.0-0.tar.bz2",
+  "package_sha256": "3ac89f5f67de84054e1e576c9ad5f7ef6f562cef7b2504a3fa992c079cf72f8c",
+  "source_files": {
+    "MNI9.nii.gz": "26d72953bf17b2bebda9775e21dfd3177ed2dfa5ecf2f55c3a3ff64023c998e5",
+    "HOsub.nii.gz": "72140df8117250d915b753ca2937e078c917525d206e6185e2c1b4ab703fbfcc",
+    "MNI.xml": "fa9a73459a8b254776020e4f1da26727c08a63262cb17cd2bd664845d8c58e1b",
+    "HOsub.xml": "4aa369944d514843a07b5e6febac0c844e76fc1980ab203a0021b083de699650"
+  },
+  "source_docs": "https://fsl.fmrib.ox.ac.uk/fsl/docs/other/datasets.html",
+  "license": "See FSL license and Harvard-Oxford CC BY-SA 4.0; source files and build code retained.",
+  "limitations": [
+    "Display-level bilateral macro regions, not a new validated atlas.",
+    "Unlabelled lesion voxels are quantified separately; not complete brain coverage.",
+    "MNI grid compatibility does not establish patient anatomical registration quality."
+  ]
+}

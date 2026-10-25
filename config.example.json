@@ -1,0 +1,22 @@
+{
+  "lesion_root": "/path/to/C3_LesionMNI2mm",
+  "source_files": {
+    "early": "/path/to/c3_bl_v1y_210714.sas7bdat",
+    "late": "/path/to/cnsr3_lzz_20260130.sas7bdat"
+  },
+  "sas_encoding": null,
+  "id_width": null,
+  "id_mode": "numeric_code_n",
+  "id_regex": "^(?:sub-)?(?P<id>[0-9]+)(?:$|[_-])",
+  "atlas_path": "atlas/display_MNI9_HObrainstem_2mm.nii.gz",
+  "atlas_labels": "atlas/labels.tsv",
+  "atlas_provenance": "atlas/provenance.json",
+  "declared_mask_space": "FSL MNI152 2mm; supplied folder; anatomical registration not rechecked",
+  "allow_unknown_units_if_exact_grid": true,
+  "primary_membership": "any_positive_overlap",
+  "sensitivity_min_overlap_ml": 0.1,
+  "death_definition": "mrs_equal_6_only_at_all_visits",
+  "carry_forward": false,
+  "diagnosis_filter": null,
+  "output_root": "outputs"
+}

@@ -1,0 +1,33 @@
+Sources and attribution for the task-specific display atlas
+
+Source archive (downloaded 2026-10-25):
+https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/noarch/fsl-data_atlases-2103.0-0.tar.bz2
+SHA256: 3ac89f5f67de84054e1e576c9ad5f7ef6f562cef7b2504a3fa992c079cf72f8c
+
+MNI Structural Atlas, distributed by FSL; original labels attributed to Jack Lancaster,
+Research Imaging Center, UTHSCSA, originating from the McConnell Brain Imaging Centre, MNI.
+Harvard-Oxford Subcortical Structural Atlas; segmentations from the Harvard Center for
+Morphometric Analysis. Brain-Stem is label 8 in the maximum-probability image.
+
+Dataset documentation and source credits:
+https://fsl.fmrib.ox.ac.uk/fsl/docs/other/datasets.html
+XML index convention:
+https://fsl.fmrib.ox.ac.uk/fsl/docs/other/atlas_xml.html
+
+License information:
+https://fsl.fmrib.ox.ac.uk/fsl/docs/license.html
+Harvard-Oxford is distributed under CC BY-SA 4.0:
+https://creativecommons.org/licenses/by-sa/4.0/
+The FSL license and atlas-specific terms remain applicable to the source assets.
+This bundle is provided for the user's academic research; no commercial rights are asserted.
+Saved original license pages accompany these files. Attribution and license notices
+must remain with any further distribution of source or adapted atlas assets.
+
+Modification notice:
+The task-specific display map preserves MNI9 regions except where the HO Brain-Stem
+mask has priority. It adds label 10 for Brainstem. This is not an official FSL atlas,
+is not an independently validated parcellation, and does not claim complete brain coverage.
+The modifications, source hashes and overlap counts are recorded in provenance.json.
+The original four source files and build_display_atlas.py are retained for reproducibility.
+Attribution: source institutions above; task-specific adaptation generated for this research
+workflow on 2026-10-25. No endorsement by source atlas creators is implied.

@@ -1,0 +1,11 @@
+label_id	roi_name	roi_name_zh	source
+1	Caudate	尾状核	MNI structural maxprob thr25; label1; excluding HO brainstem
+2	Cerebellum	小脑	MNI structural maxprob thr25; label2; excluding HO brainstem
+3	Frontal Lobe	额叶	MNI structural maxprob thr25; label3; excluding HO brainstem
+4	Insula	岛叶	MNI structural maxprob thr25; label4; excluding HO brainstem
+5	Occipital Lobe	枕叶	MNI structural maxprob thr25; label5; excluding HO brainstem
+6	Parietal Lobe	顶叶	MNI structural maxprob thr25; label6; excluding HO brainstem
+7	Putamen	壳核	MNI structural maxprob thr25; label7; excluding HO brainstem
+8	Temporal Lobe	颞叶	MNI structural maxprob thr25; label8; excluding HO brainstem
+9	Thalamus	丘脑	MNI structural maxprob thr25; label9; excluding HO brainstem
+10	Brainstem	脑干	HO subcortical maxprob thr25; label8

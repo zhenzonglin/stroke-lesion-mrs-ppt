@@ -1,0 +1,85 @@
+急性梗死ROI与长期mRS汇总 v2
+2026-10-25
+
+此次依据已确认信息配置：
+病灶目录 /data/usersdir/linzhenzong/Substain/C3_LesionMNI2mm
+3/12月SAS /data/usersdir/linzhenzong/WMH/sas/c3_bl_v1y_210714.sas7bdat
+24/36/48/60月SAS /data/usersdir/linzhenzong/WMH/sas/cnsr3_lzz_20260130.sas7bdat
+主键 code_n。程序在每次运行时核对类型、缺失、重复及连接范围。
+仓库不包含真实病灶、SAS或患者结果。
+
+运行方法
+1. 在工作站git clone https://github.com/zhenzonglin/stroke-lesion-mrs-ppt.git。
+2. 进入仓库，按README或“工作站命令.txt”配置环境并生成config.local.json。
+3. 运行run_summary.py，在仓库outputs下新建带UTC时间戳的结果目录。
+4. 每页截图后按Enter，发送全部PAGE页面。亦可只发share.zip，数字更完整。
+5. 需要重看时，使用终端打印的python ... --review ... --page N，不重读原数据。
+
+环境与安全范围
+沿用wmh-hcy Python环境；只需已有numpy、nibabel、pyreadstat、pandas。
+图谱已附带，运行不需要联网，不安装或升级工作站环境。
+不改原项目配置，不重新配准、分割、拟合或插补。
+所有路径、文件名规则、单位解释、ROI敏感性阈值均在config.local.json；该文件被Git忽略。
+默认只从文件名开头的数字ID或sub-数字ID取主键，不从任意数字片段猜测。
+因为SAS code_n已确认是数值型，数字文件ID按整数规范化，可消除纯数字前导零；
+只在两份SAS实际仍为数值型且无规范化冲突时允许该规则。
+若未知命名、重复ID或目录扫描不完整，停止ROI统计并输出INPUTS_REQUIRED。
+检查匿名命名格式页以便修正config.local.json，不要随意删除文件。
+
+人群与死亡定义
+对early和late的ID取并集；任一来源缺席的访视保留缺失，不丢掉仅有长期记录者。
+全体能匹配任一临床来源的急性梗死掩膜参与格式检查。不限制3月独立或5年结局可见。
+不以D_DIAG再筛队列；TIA编码与其他/缺失数单列，供研究者核对。
+所有时间点仅当该次mRS=6时计死亡，完全不读取D_DEATH或F*_DEATH。
+不向前或向后填补mRS，包括已经6分后的缺失。
+已观察到6后再出现0-5的访视标为conflict，先前6保留，后续缺失仍为missing。
+这些记录仍在固定总N中，不被解释为死亡后恢复；原始频数另存mrs_audit。
+截图中3/12个月原始mRS无6分，因此新口径可能显示0例死亡。
+这表示该字段未记录6分，不能解释为队列当时没有真实死亡。
+
+ROI定义
+主定义：病灶与该ROI存在任意正重叠；人数比例=n_ROI/N_valid。
+敏感性定义：重叠体积>=0.1mL；这是可配置的展示阈值，不是临床分界值。
+主汇总和敏感性使用同一有效非空掩膜分母，ROI之间允许患者重叠。
+roi_summary.csv中any_overlap_n/any_overlap_proportion是主结果，n/proportion为阈值版本。
+有效但完全不落入所用ROI的患者仍留在总体分母，未覆盖比例会报告。
+
+展示图谱与空间
+本包使用固定FSL数据包fsl-data_atlases-2103.0-0，官方文件SHA256已核对。
+MNI structural maxprob thr25 2mm的9个双侧合并区域，加HO subcortical的Brain-Stem。
+脑干体素优先覆盖二者重叠区；构建记录在atlas/provenance.json。
+这是本次展示用的自定义组合，不声称它是完整脑覆盖或另一个经验证的标准图谱。
+额叶、顶叶、颞叶、枕叶、岛叶、尾状核、壳核、丘脑、小脑、脑干共10区。
+源图谱、XML与构建代码均附带；数据来源/许可见atlas/来源与许可.txt及原许可网页。
+程序要求病灶与图谱在轴重排后shape/affine一致，不插值、不自动配准。
+对于缺少NIfTI单位字段但与毫米图谱精确同网格的文件，config明确允许按mm解释；
+此类人数单列。明确标为meter/micron或网格不符者不作此解释。
+这是几何相容性检查，不代表重新验证了解剖配准质量。
+非二值、空掩膜、非有限值、qform/sform冲突、错网格等逐例列出排除原因。
+
+输出与回传
+outputs/<timestamp>/share.zip 为唯一推荐回传包，内含：
+  ppt_data.json：全部精确数字、规则、来源、软件版本、图谱指纹和审计。
+  roi_summary.csv：每ROI两种累及人数/比例、体积和共同分母。
+  primary_distributions.csv：总体及每ROI六次mRS0-6/缺失/非法/冲突。
+  primary_transitions.csv：从同一患者相邻两次访视计算的非零转移边。
+  primary_state3_*.csv：独立0-2、依赖3-5、死亡6与缺失/非法/冲突。
+  primary_change.csv：改善/稳定/恶化（仅两次均0-5者）、死亡与缺失等。
+  sensitivity_*.csv：>=0.1mL定义的全部对应表。
+  screenshots.txt与page_XX.txt：可分页截图查看。
+  manifest.json：汇总文件大小及SHA256。
+private/下的mask_inventory.csv、mask_exclusions.csv、derived_states.csv和failure.txt
+可能含患者ID、路径或个体状态，只留工作站，不会打包到share.zip。
+不需要上传个体影像或SAS。
+
+状态解释
+COMPLETED：统计生成且人数/转移边际守恒；不等于病灶配准已人工审核。
+COMPLETED_WITH_FLAGS：已有有效子集结果，但存在影像排除或mRS矛盾，需核对相应页。
+INPUTS_REQUIRED：路径、命名、字段或ID问题阻断，未生成ROI结论。
+NO_VALID_MASKS：没有通过格式/网格检查的匹配掩膜，不能当作0病灶负担。
+FAILED：见private/failure.txt；不要使用该次结果制作正式PPT。
+
+之后的PPT
+先总体mRS趋势，再10区脑图标注n/N，点击区域进入同格式趋势并可返回。
+图中死亡应标“mRS=6”，缺失单列；这不是完整死亡率或因果效应。
+主汇总为描述性，不进行显著性检验或按P值挑选脑区。

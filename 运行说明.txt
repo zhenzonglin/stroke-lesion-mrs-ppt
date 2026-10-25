@@ -1,6 +1,19 @@
 急性梗死ROI与长期mRS汇总：13区图谱版本v2
 2026-10-25
 
+出院时致残性缺血性卒中亚组（新增独立入口）
+python supplement_discharge_cohort.py --run-dir outputs/<原v2运行时间戳>
+来源必须是原13区全体队列运行，保留其private目录；不使用deep_union补统计目录。
+从原有效非空影像队列选择D_DIAG=1且D_MRS为有效整数2-6者。
+D_MRS为出院mRS；缺字段时阻断，不用随访mRS代替。
+原SAS的SHA256必须与原运行一致；仅新读取code_n、D_DIAG、D_MRS。
+出院6分按D_MRS>=2字面条件保留并单列；其后0-5分另标冲突，缺失不前填。
+重读一次原掩膜，验证原13区与总体六次频数，再重算亚组与四区联合人群。
+保留原13区编号和显示顺序，不把旧排序宣称为新亚组的累及率排序。
+输出到新目录outputs/discharge_<UTC>/；share.zip只含汇总，private留在工作站。
+回传分享包或全部PAGE后，沿用现有PPT版式及每个时间点三组同步延伸动画。
+以下“不按诊断筛选”等规则仅说明原全体队列入口，不用于本新增亚组。
+
 本次更新
 工作站已有仓库时先git pull --ff-only，再运行：
 python configure_workstation.py --data-root /data/usersdir/linzhenzong --atlas-version v2

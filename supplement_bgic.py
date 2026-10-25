@@ -91,18 +91,25 @@ def component_ids(report: dict) -> tuple[str, str]:
 
 
 def targeted_atlas(atlas: dict, bg_id: str, ic_id: str) -> dict:
+    return union_atlas(atlas, [bg_id, ic_id], MERGED_ID, MERGED_NAME)
+
+
+def union_atlas(atlas: dict, component_roi_ids: list[str], union_id: str, union_name: str) -> dict:
+    """选取组成区并增加二值OR通道；不改变原图谱或原label_id含义。"""
     if atlas.get("atlas_format") != "independent_binary_channels":
         raise ValueError("The supplement requires the v2 independent binary ROI atlas")
     by_id = {row["roi_id"]: row for row in atlas["labels"]}
-    if bg_id not in by_id or ic_id not in by_id:
+    if not component_roi_ids or len(set(component_roi_ids)) != len(component_roi_ids):
+        raise ValueError("Union requires distinct component ROI IDs")
+    if union_id in by_id or any(key not in by_id for key in component_roi_ids):
         raise ValueError("Component ROI IDs are absent from the frozen atlas")
-    bg = atlas["private_channel_masks"][..., by_id[bg_id]["label_id"]-1]
-    ic = atlas["private_channel_masks"][..., by_id[ic_id]["label_id"]-1]
-    union = bg | ic
-    masks = np.stack((bg, ic, union), axis=3)
+    components = [(key, by_id[key]["roi_name"], atlas["private_channel_masks"][..., by_id[key]["label_id"]-1])
+                  for key in component_roi_ids]
+    union = np.logical_or.reduce([row[2] for row in components])
+    components.append((union_id, union_name, union))
+    masks = np.stack([row[2] for row in components], axis=3)
     labels = []
-    for index, (roi_id, name, values) in enumerate(((bg_id, "Basal Ganglia", bg),
-            (ic_id, "Internal Capsule", ic), (MERGED_ID, MERGED_NAME, union)), 1):
+    for index, (roi_id, name, values) in enumerate(components, 1):
         count = int(np.count_nonzero(values))
         labels.append({"label_id": index, "roi_id": roi_id, "roi_name": name,
                        "roi_voxels": count, "roi_volume_ml": count*atlas["voxel_volume_ml"]})
@@ -120,8 +127,8 @@ def _atlas_file(report: dict, key: str, config_key: str, repo: Path) -> Path:
     raise ValueError("The original frozen atlas or label file is unavailable")
 
 
-def summarize(run_dir: Path, progress=None) -> dict:
-    """全部复现检查通过后才返回分享结果，异常中不包含患者标识。"""
+def load_reproduction_context(run_dir: Path) -> tuple:
+    """只读加载原运行的派生状态与匹配清单，验证冻结图谱。返回值仅限进程内。"""
     run_dir = run_dir.resolve()
     report_path = run_dir/"share/ppt_data.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
@@ -153,10 +160,12 @@ def summarize(run_dir: Path, progress=None) -> dict:
     if (atlas["sha256"] != report["atlas"]["sha256"]
             or atlas["labels_sha256"] != report["atlas"]["labels_sha256"]):
         raise ValueError("Frozen atlas checksums differ from the original run")
-    bg_id, ic_id = component_ids(report)
-    restricted = targeted_atlas(atlas, bg_id, ic_id)
-    roi = analyse_masks(mapping, restricted, float(cfg["sensitivity_min_overlap_ml"]), progress=progress,
-                        allow_unknown_units_if_exact_grid=cfg["allow_unknown_units_if_exact_grid"])
+    return report, states, mapping, old_exclusions, atlas, report_path, states_path, inventory_path
+
+
+def verify_reproduction(report: dict, states: dict, old_exclusions: dict, roi: dict,
+                        component_roi_ids: list[str]) -> tuple[dict, dict, dict, dict]:
+    """复现原有效集合、排除原因和全部组成区两种阈值的完整mRS边际。"""
     if roi["private_valid_ids"] != set(states):
         raise ValueError("Rechecked valid patient set differs from the original run; rerun the full workflow")
     if roi["private_exclusions"] != old_exclusions:
@@ -165,15 +174,28 @@ def summarize(run_dir: Path, progress=None) -> dict:
     sensitivity = aggregate_groups(states, roi["private_memberships"])
     original_rows = {row["roi_id"]: row for row in report["roi"]["roi_rows"]}
     current_rows = {row["roi_id"]: row for row in roi["roi_rows"]}
-    for key in (bg_id, ic_id):
+    for key in component_roi_ids:
         if current_rows[key]["any_overlap_n"] != original_rows[key]["any_overlap_n"]:
             raise ValueError("Component any-overlap count differs from the original report")
         if current_rows[key]["n"] != original_rows[key]["n"]:
             raise ValueError("Component sensitivity count differs from the original report")
     for version, current in (("primary", primary), ("sensitivity", sensitivity)):
-        for key in ("overall", bg_id, ic_id):
+        for key in ("overall", *component_roi_ids):
             if distribution_counts(current["distributions"], key) != distribution_counts(report[version]["distributions"], key):
                 raise ValueError("Overall or component six-visit mRS distributions do not reproduce the source run")
+    return primary, sensitivity, original_rows, current_rows
+
+
+def summarize(run_dir: Path, progress=None) -> dict:
+    """全部复现检查通过后才返回分享结果，异常中不包含患者标识。"""
+    report, states, mapping, old_exclusions, atlas, report_path, states_path, inventory_path = load_reproduction_context(run_dir)
+    cfg = report["config"]
+    original_n = int(report["roi"]["valid_n"])
+    bg_id, ic_id = component_ids(report)
+    restricted = targeted_atlas(atlas, bg_id, ic_id)
+    roi = analyse_masks(mapping, restricted, float(cfg["sensitivity_min_overlap_ml"]), progress=progress,
+                        allow_unknown_units_if_exact_grid=cfg["allow_unknown_units_if_exact_grid"])
+    primary, sensitivity, original_rows, current_rows = verify_reproduction(report, states, old_exclusions, roi, [bg_id, ic_id])
     bg = roi["private_any_memberships"][bg_id]
     ic = roi["private_any_memberships"][ic_id]
     union = roi["private_any_memberships"][MERGED_ID]

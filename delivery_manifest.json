@@ -8,8 +8,8 @@
     "sha256": "b08c46a2bdc9eab5a4efd91ad9234a651899c364cb8ce3833ebbc733ee41db83"
   },
   "README.md": {
-    "bytes": 7599,
-    "sha256": "ce41ab3012837b0c7ee06ffa02c06ffaf31697eb12ea771a5dd8fb9736479999"
+    "bytes": 8918,
+    "sha256": "7cc0ef572883a5bcca98de81ef03dc14d09981eedaef9485c1821cdec41ee9dd"
   },
   "atlas/CC_BY_SA_4_legalcode.txt": {
     "bytes": 20138,
@@ -187,6 +187,10 @@
     "bytes": 20361,
     "sha256": "0069a63ca4f1e2044aaab10686ebe44103833b62cf0628a2c764fee5c6f12bea"
   },
+  "supplement_bgic.py": {
+    "bytes": 19282,
+    "sha256": "0b6644be0062daf41958771ece1d341934e1945e44297d0f2382bb577371f96b"
+  },
   "test_atlas_v2.py": {
     "bytes": 4838,
     "sha256": "254d243250c02f4f17563068533507f2e5fee5e83fb70784b96809c5a9a5711b"
@@ -206,6 +210,10 @@
   "test_run_summary.py": {
     "bytes": 11885,
     "sha256": "e391ab3843db31b04cb075ada6f82853ccaa1fea5e5291f6b0d5db639a28a589"
+  },
+  "test_supplement_bgic.py": {
+    "bytes": 8522,
+    "sha256": "97ccf515ff011a366273cd8ef5c4cb88b0db484416011b751a35739c10a543de"
   },
   "工作站命令.txt": {
     "bytes": 398,

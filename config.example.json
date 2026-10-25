@@ -11,6 +11,8 @@
   "atlas_path": "atlas/display_MNI9_HObrainstem_2mm.nii.gz",
   "atlas_labels": "atlas/labels.tsv",
   "atlas_provenance": "atlas/provenance.json",
+  "atlas_format": "discrete_labels",
+  "display_outcome": null,
   "declared_mask_space": "FSL MNI152 2mm; supplied folder; anatomical registration not rechecked",
   "allow_unknown_units_if_exact_grid": true,
   "primary_membership": "any_positive_overlap",

@@ -11,6 +11,12 @@ MRS_FIELDS = {3: "F3_MRS", 12: "F12_MRS", **{m: f"m{m}_mrs" for m in MONTHS[2:]}
 STATES = tuple(str(value) for value in range(7)) + ("missing", "invalid", "conflict")
 RAW_STATES = STATES[:-1]
 STATE3 = ("independent", "dependent", "death", "missing", "invalid", "conflict")
+RECOVERY_GROUPS = (("good_recovery", "恢复良好", ("0", "1")),
+                   ("functional_disability", "功能残疾", ("2", "3")),
+                   ("functional_loss", "功能丧失", ("4", "5", "6")))
+OUTCOME_DEFINITIONS = (("mrs_2_5", "残疾（mRS 2–5）", ("2", "3", "4", "5")),
+                       ("mrs_2_6", "残疾或死亡（mRS 2–6）", ("2", "3", "4", "5", "6")),
+                       ("mrs_2_3", "功能残疾分组（mRS 2–3）", ("2", "3")))
 CHANGE = ("improved", "stable", "worsened", "to_death", "remaining_death",
           "death_after_missing", "missing_after_death", "missing", "invalid", "conflict")
 _SPECIAL_MISSING = re.compile(r"^(?:|\.|\.?[A-Z_])$", re.IGNORECASE)
@@ -154,8 +160,11 @@ def aggregate_groups(states: dict[str, dict[int, str]], groups: dict[str, set[st
     memberships = {"overall": all_ids, **memberships}
     result = {"groups": [], "distributions": [], "transitions": [],
               "state3_distributions": [], "state3_transitions": [], "change": [],
+              "recovery_distributions": [], "outcome_rates": [],
               "validation": {"all_passed": True, "death_to_alive_transitions_n": 0,
-                             "fixed_denominator": True, "marginal_checks_n": 0},
+                             "fixed_denominator": True, "marginal_checks_n": 0,
+                             "fixed_denominator_scope": "original distributions, transitions, state3 and change tables",
+                             "recovery_partition_checks_n": 0},
               "definitions": {
                   "proportion": "n divided by fixed group denominator, from 0 to 1",
                   "proportion_from_state": "transition n divided by source-state n",
@@ -163,6 +172,9 @@ def aggregate_groups(states: dict[str, dict[int, str]], groups: dict[str, set[st
                   "missing_after_death": "mRS6 followed by missing; no death carry-forward",
                   "death_after_missing": "missing followed by mRS6; death time is not inferred",
                   "roi_overlap": "One participant may enter multiple ROIs; do not sum ROI Ns or proportions",
+                  "recovery_distributions": "User-defined 0-1 / 2-3 / 4-6 groups; denominator observed valid mRS 0-6 at each visit. mRS6 remains death.",
+                  "outcome_rates": "Three alternative numerators 2-5 / 2-6 / 2-3; denominator always all valid observed mRS 0-6, including death. Not survivor-only disability prevalence.",
+                  "valid_mrs_denominator": "Excludes missing, invalid and conflict only at that visit; no carry-forward or complete-case restriction.",
               }}
     for group, ids in memberships.items():
         n_group = len(ids)
@@ -170,6 +182,25 @@ def aggregate_groups(states: dict[str, dict[int, str]], groups: dict[str, set[st
         counters = {month: Counter(states[identifier][month] for identifier in ids) for month in MONTHS}
         counters3 = {month: Counter(_state3(states[identifier][month]) for identifier in ids) for month in MONTHS}
         for month in MONTHS:
+            observed_n = sum(counters[month][state] for state in STATES[:7])
+            common = {"group": group, "month": month, "valid_n": observed_n,
+                      "total_n": n_group, "death6_n": counters[month]["6"],
+                      "missing_n": counters[month]["missing"],
+                      "invalid_n": counters[month]["invalid"],
+                      "conflict_n": counters[month]["conflict"]}
+            for key, label, selected_states in RECOVERY_GROUPS:
+                n = sum(counters[month][state] for state in selected_states)
+                result["recovery_distributions"].append({**common, "category": key, "category_label": label,
+                    "mrs_scores": ",".join(selected_states), "n": n, "denominator": observed_n,
+                    "proportion": _ratio(n, observed_n)})
+            if sum(row["n"] for row in result["recovery_distributions"][-3:]) != observed_n:
+                raise RuntimeError("Recovery categories do not partition valid observed mRS")
+            result["validation"]["recovery_partition_checks_n"] += 1
+            for key, label, selected_states in OUTCOME_DEFINITIONS:
+                n = sum(counters[month][state] for state in selected_states)
+                result["outcome_rates"].append({**common, "definition": key, "definition_label": label,
+                    "mrs_scores": ",".join(selected_states), "numerator_n": n,
+                    "denominator_n": observed_n, "proportion": _ratio(n, observed_n)})
             for state in STATES:
                 n = counters[month][state]
                 result["distributions"].append({"group": group, "month": month, "state": state,

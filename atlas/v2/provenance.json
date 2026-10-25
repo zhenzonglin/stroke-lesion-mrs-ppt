@@ -1,0 +1,398 @@
+{
+  "name": "Custom independent MNI HO JHU display regions",
+  "version": "20261025_v2",
+  "is_standard_unmodified_atlas": false,
+  "space": "FSL MNI152 2mm",
+  "bilateral_regions": true,
+  "atlas_format": "independent_binary_channels",
+  "channel_order": [
+    "Basal Ganglia",
+    "Cerebellum",
+    "Frontal Lobe",
+    "Insula",
+    "Occipital Lobe",
+    "Parietal Lobe",
+    "Internal Capsule",
+    "Temporal Lobe",
+    "Thalamus",
+    "Brainstem",
+    "Corona Radiata",
+    "Centrum Semiovale",
+    "Corpus Callosum"
+  ],
+  "shape": [
+    91,
+    109,
+    91,
+    13
+  ],
+  "affine": [
+    [
+      -2.0,
+      0.0,
+      0.0,
+      90.0
+    ],
+    [
+      0.0,
+      2.0,
+      0.0,
+      -126.0
+    ],
+    [
+      0.0,
+      0.0,
+      2.0,
+      -72.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "definitions": {
+    "basal_ganglia": {
+      "MNI_v1_label_values": [
+        1,
+        7
+      ],
+      "HO_pallidum_label_values": [
+        7,
+        18
+      ],
+      "definition": "Union of v1 Caudate and Putamen plus bilateral HO Pallidum"
+    },
+    "internal_capsule": {
+      "JHU_label_values": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "labels": [
+        "Anterior limb of internal capsule R",
+        "Anterior limb of internal capsule L",
+        "Posterior limb of internal capsule R",
+        "Posterior limb of internal capsule L",
+        "Retrolenticular part of internal capsule R",
+        "Retrolenticular part of internal capsule L"
+      ]
+    },
+    "corona_radiata": {
+      "JHU_label_values": [
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "labels": [
+        "Anterior corona radiata R",
+        "Anterior corona radiata L",
+        "Superior corona radiata R",
+        "Superior corona radiata L",
+        "Posterior corona radiata R",
+        "Posterior corona radiata L"
+      ]
+    },
+    "corpus_callosum": {
+      "JHU_label_values": [
+        3,
+        4,
+        5
+      ],
+      "labels": [
+        "Genu of corpus callosum",
+        "Body of corpus callosum",
+        "Splenium of corpus callosum"
+      ]
+    },
+    "centrum_semiovale": {
+      "is_operational_approximation": true,
+      "definition": "HO bilateral cerebral white matter above the highest HO lateral-ventricle voxel centre, excluding JHU corpus callosum. No erosion or additional atlas labels.",
+      "HO_white_matter_label_values": [
+        1,
+        12
+      ],
+      "HO_lateral_ventricle_label_values": [
+        3,
+        14
+      ],
+      "MNI_z_strictly_greater_than_mm": 28.0,
+      "excluded_JHU_label_values": [
+        3,
+        4,
+        5
+      ],
+      "not_equivalent_to": "JHU Superior Corona Radiata",
+      "overlap_with_corona_radiata_voxels": 1491,
+      "overlap_with_corpus_callosum_voxels": 0,
+      "outside_HO_cerebral_white_matter_voxels": 0,
+      "literature_support_is_anatomical_location_only": true,
+      "source_reference": "https://doi.org/10.3389/fneur.2022.888511",
+      "limitation": "Custom approximate region, not a validated CSO atlas or a reproduction of the cited study's segmentation. Cortical U-fibres are not specifically removed."
+    },
+    "unchanged_v1_label_values": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10
+    ]
+  },
+  "construction": "No resampling. Preserve the eight unchanged v1 regions as binary channels. Merge caudate, putamen and pallidum within one channel. Add independent white-matter channels without overwriting existing channels.",
+  "pairwise_overlap_voxels": [
+    [
+      4575,
+      0,
+      0,
+      0,
+      0,
+      0,
+      307,
+      0,
+      5,
+      0,
+      39,
+      0,
+      124
+    ],
+    [
+      0,
+      25838,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      57915,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      5,
+      3447,
+      90
+    ],
+    [
+      0,
+      0,
+      0,
+      2438,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      21542,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      234,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      35927,
+      0,
+      0,
+      0,
+      0,
+      42,
+      3909,
+      392
+    ],
+    [
+      307,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2404,
+      0,
+      373,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      29910,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      5,
+      0,
+      0,
+      0,
+      0,
+      0,
+      373,
+      0,
+      2488,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      4890,
+      0,
+      0,
+      0
+    ],
+    [
+      39,
+      0,
+      5,
+      0,
+      0,
+      42,
+      0,
+      0,
+      0,
+      0,
+      4463,
+      1491,
+      0
+    ],
+    [
+      0,
+      0,
+      3447,
+      0,
+      234,
+      3909,
+      0,
+      0,
+      0,
+      0,
+      1491,
+      19201,
+      0
+    ],
+    [
+      124,
+      0,
+      90,
+      0,
+      0,
+      392,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      4401
+    ]
+  ],
+  "union_voxels": 205583,
+  "sum_channel_voxels": 215992,
+  "atlas_sha256": "0ebffd8d146bd50b6c5fe3be02a61e412efa2572ef6b1e6a3deaf4f750aa87a7",
+  "labels_sha256": "264b51fd1cdce61455a6a4a3849429ab64ef5d8bcfcef50bbb8ff0d001aefa8b",
+  "display_only_atlas_sha256": "c1cf6e2aac27e886faa63dedb573ad4c507fe6dfcda10aa4ef65afb57da1681e",
+  "package_url": "https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/noarch/fsl-data_atlases-2103.0-0.tar.bz2",
+  "package_sha256": "3ac89f5f67de84054e1e576c9ad5f7ef6f562cef7b2504a3fa992c079cf72f8c",
+  "source_files": {
+    "MNI9.nii.gz": {
+      "package_member": "data/atlases/MNI/MNI-maxprob-thr25-2mm.nii.gz",
+      "sha256": "26d72953bf17b2bebda9775e21dfd3177ed2dfa5ecf2f55c3a3ff64023c998e5"
+    },
+    "HOsub.nii.gz": {
+      "package_member": "data/atlases/HarvardOxford/HarvardOxford-sub-maxprob-thr25-2mm.nii.gz",
+      "sha256": "72140df8117250d915b753ca2937e078c917525d206e6185e2c1b4ab703fbfcc"
+    },
+    "MNI.xml": {
+      "package_member": "data/atlases/MNI.xml",
+      "sha256": "fa9a73459a8b254776020e4f1da26727c08a63262cb17cd2bd664845d8c58e1b"
+    },
+    "HOsub.xml": {
+      "package_member": "data/atlases/HarvardOxford-Subcortical.xml",
+      "sha256": "4aa369944d514843a07b5e6febac0c844e76fc1980ab203a0021b083de699650"
+    },
+    "JHUlabels.nii.gz": {
+      "package_member": "data/atlases/JHU/JHU-ICBM-labels-2mm.nii.gz",
+      "sha256": "79a3badf78e91c861a10ec5b8eb277e17e6558d39ef93bfd1e365e7464cb9ebf"
+    },
+    "JHUlabels.xml": {
+      "package_member": "data/atlases/JHU-labels.xml",
+      "sha256": "84aaf30b7aa85a1f8cbb2b2afda368d9db515336dcc2b1df634e857dfa5b8218"
+    }
+  },
+  "source_docs": [
+    "https://fsl.fmrib.ox.ac.uk/fsl/docs/other/datasets.html",
+    "https://fsl.fmrib.ox.ac.uk/fsl/docs/other/atlas_xml.html"
+  ],
+  "source_label_index_rules": {
+    "MNI_HO_maxprob": "XML index + 1",
+    "JHU_Label": "XML index directly equals voxel value"
+  },
+  "license": "Source atlas terms apply. JHU atlas data may not be used commercially without permission under the supplied FSL atlas terms. Harvard-Oxford is CC BY-SA 4.0. See ../来源与许可.txt, ../FSL_license_original.html and ../CC_BY_SA_4_legalcode.txt.",
+  "limitations": [
+    "Custom regions, not a new validated whole-brain atlas.",
+    "Centrum semiovale is an explicitly operational approximate region, not a JHU label.",
+    "White-matter and lobar regions may overlap; counts and proportions must not be added.",
+    "The single-label display image must not be used for ROI statistics.",
+    "MNI grid compatibility does not establish patient anatomical registration quality."
+  ]
+}

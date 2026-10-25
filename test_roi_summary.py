@@ -150,6 +150,57 @@ class ROISummaryTest(unittest.TestCase):
         self.assertEqual(calls, [(1, 1)])
         self.assertEqual(before, {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths})
 
+    def test_independent_channels_keep_overlap_but_coverage_counts_union_once(self):
+        channels = np.zeros((*self.data.shape, 3), dtype=np.uint8)
+        # 第一个ROI代表已合并的基底节；同一受试者/体素都只计一次。
+        channels[:2, :, :, 0] = 1
+        channels[1:3, :, :, 1] = 1
+        path = self.save("independent", channels)
+        self.labels_path.write_text("label_id\troi_name\n1\tBasal Ganglia\n2\tInternal Capsule\n3\tEmpty region\n", encoding="utf-8")
+        atlas = load_atlas(path, self.labels_path, "independent_binary_channels")
+        values = np.zeros(self.data.shape, dtype=np.uint8)
+        values[1, :, :] = 1  # 25个共享体素，不得算成50个被覆盖体素。
+        lesion = self.save("overlap", values)
+        result = analyse_masks({"a": str(lesion)}, atlas)
+        self.assertEqual([row["any_overlap_n"] for row in result["roi_rows"]], [1, 1, 0])
+        self.assertEqual([row["n"] for row in result["roi_rows"]], [1, 1, 0])
+        self.assertEqual(result["coverage_summary"]["covered_voxels_total"], 25)
+        self.assertEqual(result["coverage_summary"]["pooled_covered_fraction"], 1)
+        self.assertEqual(atlas["overlapping_atlas_voxels_n"], 25)
+        self.assertEqual(atlas["shape"], [5, 5, 5])
+        self.assertEqual(atlas["source_shape"], [5, 5, 5, 3])
+        self.assertAlmostEqual(result["roi_rows"][0]["total_overlap_ml"], 25*.008)
+        self.assertEqual(result["private_any_memberships"]["roi_0001"], {"a"})
+
+    def test_independent_channel_atlas_requires_explicit_mode_binary_and_exact_labels(self):
+        channels = np.zeros((*self.data.shape, 2), dtype=np.uint8)
+        channels[0, 0, 0, :] = 1
+        path = self.save("independent_invalid", channels)
+        with self.assertRaisesRegex(ValueError, "not_3d"):
+            load_atlas(path, self.labels_path)
+        with self.assertRaisesRegex(ValueError, "match channels"):
+            load_atlas(path, self.labels_path, "independent_binary_channels")
+        self.labels_path.write_text("label_id\troi_name\n1\tA\n2\tB\n", encoding="utf-8")
+        channels[0, 0, 0, 1] = 2
+        path = self.save("nonbinary_channels", channels)
+        with self.assertRaisesRegex(ValueError, "binary"):
+            load_atlas(path, self.labels_path, "independent_binary_channels")
+
+    def test_independent_channels_axis_flip_preserves_channel_identity(self):
+        channels = np.zeros((*self.data.shape, 2), dtype=np.uint8)
+        channels[0, :, :, 0] = 1
+        channels[-1, :, :, 1] = 1
+        flip = np.eye(4)
+        flip[0, 0] = -1
+        flip[0, 3] = self.data.shape[0]-1
+        path = self.save("independent_flipped", channels[::-1], self.affine @ flip)
+        self.labels_path.write_text("label_id\troi_name\n1\tA\n2\tB\n", encoding="utf-8")
+        atlas = load_atlas(path, self.labels_path, "independent_binary_channels")
+        values = np.zeros(self.data.shape, dtype=np.uint8)
+        values[0, 0, 0] = 1
+        result = analyse_masks({"a": str(self.save("side", values))}, atlas, 0)
+        self.assertEqual([row["n"] for row in result["roi_rows"]], [1, 0])
+
 
 if __name__ == "__main__":
     unittest.main()

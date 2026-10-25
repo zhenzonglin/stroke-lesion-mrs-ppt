@@ -1,0 +1,214 @@
+{
+  "version": "20261025_v2",
+  "atlas_format": "independent_binary_channels",
+  "statistical_atlas": "roi_masks_MNI_HO_JHU_2mm.nii.gz",
+  "labels": "labels.tsv",
+  "spatial_shape": [
+    91,
+    109,
+    91
+  ],
+  "affine": [
+    [
+      -2.0,
+      0.0,
+      0.0,
+      90.0
+    ],
+    [
+      0.0,
+      2.0,
+      0.0,
+      -126.0
+    ],
+    [
+      0.0,
+      0.0,
+      2.0,
+      -72.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "channels": [
+    {
+      "label_id": 1,
+      "channel_index": 0,
+      "roi_id": "roi_0001",
+      "roi_name": "Basal Ganglia",
+      "roi_name_zh": "基底节",
+      "slug": "basal_ganglia",
+      "mask_path": "roi_masks/basal_ganglia.nii.gz",
+      "mask_sha256": "d5ec5ee02dfb667fe60e4dbb95ab7e23475fa16f555efde1849199caa0701165",
+      "voxel_count": 4575,
+      "definition": "MNI Caudate + Putamen union HO Pallidum"
+    },
+    {
+      "label_id": 2,
+      "channel_index": 1,
+      "roi_id": "roi_0002",
+      "roi_name": "Cerebellum",
+      "roi_name_zh": "小脑",
+      "slug": "cerebellum",
+      "mask_path": "roi_masks/cerebellum.nii.gz",
+      "mask_sha256": "856b81f28ab5256654dbfae07b3e7339d944667f1d55e3c41f8ad27994ab4464",
+      "voxel_count": 25838,
+      "definition": "Unchanged v1 label 2"
+    },
+    {
+      "label_id": 3,
+      "channel_index": 2,
+      "roi_id": "roi_0003",
+      "roi_name": "Frontal Lobe",
+      "roi_name_zh": "额叶",
+      "slug": "frontal_lobe",
+      "mask_path": "roi_masks/frontal_lobe.nii.gz",
+      "mask_sha256": "17160c2a22170c6cb784435a3be937cc6990ce3337cf57a015996e510c4e1a7a",
+      "voxel_count": 57915,
+      "definition": "Unchanged v1 label 3"
+    },
+    {
+      "label_id": 4,
+      "channel_index": 3,
+      "roi_id": "roi_0004",
+      "roi_name": "Insula",
+      "roi_name_zh": "岛叶",
+      "slug": "insula",
+      "mask_path": "roi_masks/insula.nii.gz",
+      "mask_sha256": "6df0aab8380efc2b00c770d613ec7777bccb905b2de16488fb393b3457f83e66",
+      "voxel_count": 2438,
+      "definition": "Unchanged v1 label 4"
+    },
+    {
+      "label_id": 5,
+      "channel_index": 4,
+      "roi_id": "roi_0005",
+      "roi_name": "Occipital Lobe",
+      "roi_name_zh": "枕叶",
+      "slug": "occipital_lobe",
+      "mask_path": "roi_masks/occipital_lobe.nii.gz",
+      "mask_sha256": "a2ffb6ab162da449ca2bcc18a26d24a85e83c1b8925fbbe5aa4c2cfb121c8205",
+      "voxel_count": 21542,
+      "definition": "Unchanged v1 label 5"
+    },
+    {
+      "label_id": 6,
+      "channel_index": 5,
+      "roi_id": "roi_0006",
+      "roi_name": "Parietal Lobe",
+      "roi_name_zh": "顶叶",
+      "slug": "parietal_lobe",
+      "mask_path": "roi_masks/parietal_lobe.nii.gz",
+      "mask_sha256": "6c1b3f391733262e71a908cb82ba7b8fc0ea84b69849acc8f613a05948c5e616",
+      "voxel_count": 35927,
+      "definition": "Unchanged v1 label 6"
+    },
+    {
+      "label_id": 7,
+      "channel_index": 6,
+      "roi_id": "roi_0007",
+      "roi_name": "Internal Capsule",
+      "roi_name_zh": "内囊",
+      "slug": "internal_capsule",
+      "mask_path": "roi_masks/internal_capsule.nii.gz",
+      "mask_sha256": "78658cbb93a16b60ac1ac8914ca07c9a53369e8e091989bf5a4b7f102a6acff4",
+      "voxel_count": 2404,
+      "definition": "JHU ICBM-DTI-81 labels 17,18,19,20,21,22"
+    },
+    {
+      "label_id": 8,
+      "channel_index": 7,
+      "roi_id": "roi_0008",
+      "roi_name": "Temporal Lobe",
+      "roi_name_zh": "颞叶",
+      "slug": "temporal_lobe",
+      "mask_path": "roi_masks/temporal_lobe.nii.gz",
+      "mask_sha256": "71327e2e3fbeba6390fde7c2bd19aedab824d40df50dc31e0b9acb4b12900976",
+      "voxel_count": 29910,
+      "definition": "Unchanged v1 label 8"
+    },
+    {
+      "label_id": 9,
+      "channel_index": 8,
+      "roi_id": "roi_0009",
+      "roi_name": "Thalamus",
+      "roi_name_zh": "丘脑",
+      "slug": "thalamus",
+      "mask_path": "roi_masks/thalamus.nii.gz",
+      "mask_sha256": "df1066ca6982ee067bd6491549c162d8bb6a27c460bc2f484398e3a0d88aee53",
+      "voxel_count": 2488,
+      "definition": "Unchanged v1 label 9"
+    },
+    {
+      "label_id": 10,
+      "channel_index": 9,
+      "roi_id": "roi_0010",
+      "roi_name": "Brainstem",
+      "roi_name_zh": "脑干",
+      "slug": "brainstem",
+      "mask_path": "roi_masks/brainstem.nii.gz",
+      "mask_sha256": "a43787d29cd92140dfb84bbf3309109ab2f01d7dc1f17c84cfac52862e0d8da6",
+      "voxel_count": 4890,
+      "definition": "Unchanged v1 label 10"
+    },
+    {
+      "label_id": 11,
+      "channel_index": 10,
+      "roi_id": "roi_0011",
+      "roi_name": "Corona Radiata",
+      "roi_name_zh": "放射冠",
+      "slug": "corona_radiata",
+      "mask_path": "roi_masks/corona_radiata.nii.gz",
+      "mask_sha256": "e70bf6cee00a4737985817bf88ff031f4c2e3ffca842d62027a02d0a0bc587dd",
+      "voxel_count": 4463,
+      "definition": "JHU ICBM-DTI-81 labels 23,24,25,26,27,28"
+    },
+    {
+      "label_id": 12,
+      "channel_index": 11,
+      "roi_id": "roi_0012",
+      "roi_name": "Centrum Semiovale",
+      "roi_name_zh": "半卵圆中心（操作性定义）",
+      "slug": "centrum_semiovale",
+      "mask_path": "roi_masks/centrum_semiovale.nii.gz",
+      "mask_sha256": "a03cd778b73156068bafaa1e027e13d8ca706286c085619f13642bb50a85d3c7",
+      "voxel_count": 19201,
+      "definition": "Operational HO white matter above lateral ventricle roof excluding JHU CC"
+    },
+    {
+      "label_id": 13,
+      "channel_index": 12,
+      "roi_id": "roi_0013",
+      "roi_name": "Corpus Callosum",
+      "roi_name_zh": "胼胝体",
+      "slug": "corpus_callosum",
+      "mask_path": "roi_masks/corpus_callosum.nii.gz",
+      "mask_sha256": "78712ea709b95cad9a47e26dbd280ee9c47265bda77181f2e54607d11d22a010",
+      "voxel_count": 4401,
+      "definition": "JHU ICBM-DTI-81 labels 3,4,5"
+    }
+  ],
+  "roi_voxel_overlap_allowed": true,
+  "coverage_rule": "OR union of all binary channels; overlapping voxels counted once",
+  "display_only_atlas": "display_MNI_HO_JHU_2mm.nii.gz",
+  "display_priority_low_to_high": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    12,
+    11,
+    13,
+    1,
+    7
+  ],
+  "display_warning": "The priority label image is for visualization only. Use the 4D binary-channel atlas for statistics."
+}

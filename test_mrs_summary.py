@@ -98,6 +98,27 @@ class MRSummaryTest(unittest.TestCase):
         self.assertEqual(len(summary["distributions"]), 60)
         self.assertEqual(summary["transitions"], [])
 
+    def test_requested_recovery_groups_and_all_outcome_definitions_use_valid_observations(self):
+        records = {str(score): record([score]*6) for score in range(7)}
+        records["missing"] = record([None]*6)
+        records["invalid"] = record([99]*6)
+        records["conflict"] = record([6, 2, 2, 2, 2, 2])
+        states, _ = derive_states(records)
+        result = aggregate_groups(states, {"roi": set(records), "empty": set()})
+        recovered = {row["category"]: row for row in result["recovery_distributions"]
+                     if row["group"] == "roi" and row["month"] == 12}
+        self.assertEqual([recovered[key]["n"] for key in ("good_recovery", "functional_disability", "functional_loss")], [2, 2, 3])
+        self.assertTrue(all(row["valid_n"] == row["denominator"] == 7 for row in recovered.values()))
+        self.assertTrue(all(row["total_n"] == 10 for row in recovered.values()))
+        rates = {row["definition"]: row for row in result["outcome_rates"]
+                 if row["group"] == "roi" and row["month"] == 12}
+        self.assertEqual([rates[key]["numerator_n"] for key in ("mrs_2_5", "mrs_2_6", "mrs_2_3")], [4, 5, 2])
+        self.assertAlmostEqual(rates["mrs_2_5"]["proportion"], 4/7)  # 含死亡的7人分母，非存活者6人。
+        self.assertEqual(rates["mrs_2_6"]["death6_n"], 1)
+        self.assertEqual(rates["mrs_2_6"]["conflict_n"], 1)
+        self.assertTrue(all(row["proportion"] is None for row in result["outcome_rates"] if row["group"] == "empty"))
+        self.assertTrue(all(row["denominator_n"] == 0 for row in result["outcome_rates"] if row["group"] == "empty"))
+
 
 if __name__ == "__main__":
     unittest.main()

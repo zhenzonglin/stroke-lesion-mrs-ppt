@@ -25,9 +25,10 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _header_problem(image: nib.Nifti1Image, allow_unknown_unit: bool = False) -> str | None:
-    if len(image.shape) != 3:
-        return "not_3d"
+def _header_problem(image: nib.Nifti1Image, allow_unknown_unit: bool = False,
+                    expected_dimensions: int = 3) -> str | None:
+    if len(image.shape) != expected_dimensions:
+        return f"not_{expected_dimensions}d"
     unit = image.header.get_xyzt_units()[0]
     if unit != "mm" and not (allow_unknown_unit and unit == "unknown"):
         return "spatial_unit_not_mm"
@@ -47,11 +48,19 @@ def _header_problem(image: nib.Nifti1Image, allow_unknown_unit: bool = False) ->
     return None
 
 
-def load_atlas(atlas_path: str | Path, labels_path: str | Path) -> dict:
-    """读取3D整数标签图和TSV；正标签必须逐一有名称，不能按表行号猜标签。"""
+def load_atlas(atlas_path: str | Path, labels_path: str | Path,
+               atlas_format: str = "discrete_labels") -> dict:
+    """读取显式指定的3D标签或4D独立二值ROI，不按表行号猜标签。
+
+    独立ROI的TSV label_id必须恰为1..通道数。跨ROI体素允许重叠，
+    每个ROI内部为二值并集，整体覆盖率另按所有通道的并集计算。
+    """
+    if atlas_format not in {"discrete_labels", "independent_binary_channels"}:
+        raise ValueError("Unsupported atlas_format")
+    independent = atlas_format == "independent_binary_channels"
     atlas_path, labels_path = Path(atlas_path), Path(labels_path)
     image = nib.load(str(atlas_path))
-    problem = _header_problem(image)
+    problem = _header_problem(image, expected_dimensions=4 if independent else 3)
     if problem:
         raise ValueError("Invalid atlas header: " + problem)
     source_shape = list(image.shape)
@@ -63,7 +72,10 @@ def load_atlas(atlas_path: str | Path, labels_path: str | Path) -> dict:
         raise ValueError("Atlas must contain finite nonnegative integer labels")
     if float(values.max(initial=0)) > np.iinfo(np.int32).max:
         raise ValueError("Atlas label values exceed int32 range")
-    data = values.astype(np.int32, copy=False)
+    if independent and not np.all((values == 0) | (values == 1)):
+        raise ValueError("Independent atlas channels must be binary 0/1")
+    channel_masks = values.astype(bool, copy=False) if independent else None
+    data = np.any(channel_masks, axis=3) if independent else values.astype(np.int32, copy=False)
     names = {}
     with labels_path.open(encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle, delimiter="\t")
@@ -83,12 +95,18 @@ def load_atlas(atlas_path: str | Path, labels_path: str | Path) -> dict:
             if not name:
                 raise ValueError("Empty ROI name in TSV")
             names[label_id] = name
-    present_labels, counts = np.unique(data, return_counts=True)
-    voxel_counts = {int(label): int(count) for label, count in zip(present_labels, counts)}
+    if independent:
+        if set(names).difference({0}) != set(range(1, image.shape[3]+1)):
+            raise ValueError("Independent ROI TSV labels must match channels 1..N exactly")
+        voxel_counts = {index+1: int(np.count_nonzero(channel_masks[..., index]))
+                        for index in range(image.shape[3])}
+    else:
+        present_labels, counts = np.unique(data, return_counts=True)
+        voxel_counts = {int(label): int(count) for label, count in zip(present_labels, counts)}
     missing_names = set(voxel_counts).difference({0}).difference(names)
     if missing_names:
         raise ValueError("Positive atlas labels lack TSV names: " + ",".join(map(str, sorted(missing_names))))
-    if not set(voxel_counts).difference({0}):
+    if not np.any(data):
         raise ValueError("Atlas has no positive labels")
     voxel_volume_ml = abs(float(np.linalg.det(image.affine[:3, :3]))) / 1000.0
     labels = [{"label_id": label_id, "roi_id": f"roi_{label_id:04d}",
@@ -98,12 +116,17 @@ def load_atlas(atlas_path: str | Path, labels_path: str | Path) -> dict:
     return {
         "atlas_path": str(atlas_path.resolve()), "labels_path": str(labels_path.resolve()),
         "sha256": _sha256(atlas_path), "labels_sha256": _sha256(labels_path),
-        "shape": list(image.shape), "affine": image.affine.tolist(),
+        "shape": list(image.shape[:3]), "affine": image.affine.tolist(),
         "source_shape": source_shape, "source_affine": source_affine,
         "axis_codes": list(nib.aff2axcodes(image.affine)), "spatial_unit": "mm",
         "voxel_volume_ml": voxel_volume_ml, "labels": labels,
-        "atlas_interpretation": "Discrete label atlas; geometric compatibility does not verify anatomical registration.",
-        "private_data": data, "private_image": image,
+        "atlas_format": atlas_format,
+        "atlas_interpretation": ("Independent binary ROIs may overlap across channels; coverage uses their union."
+                                 if independent else "Discrete label atlas.")
+                                + " Geometric compatibility does not verify anatomical registration.",
+        "overlapping_atlas_voxels_n": (int(np.count_nonzero(np.sum(channel_masks, axis=3) > 1))
+                                       if independent else 0),
+        "private_data": data, "private_channel_masks": channel_masks, "private_image": image,
     }
 
 
@@ -124,6 +147,7 @@ def analyse_masks(mapping: dict[str, str], atlas: dict, min_overlap_ml: float = 
     if not isinstance(allow_unknown_units_if_exact_grid, bool):
         raise ValueError("allow_unknown_units_if_exact_grid must be a bool")
     atlas_data = atlas["private_data"]
+    channel_masks = atlas.get("private_channel_masks")
     atlas_affine = np.asarray(atlas["affine"], dtype=float)
     atlas_shape = tuple(atlas["shape"])
     voxel_ml = float(atlas["voxel_volume_ml"])
@@ -163,9 +187,14 @@ def analyse_masks(mapping: dict[str, str], atlas: dict, min_overlap_ml: float = 
             units_assumed_mm_n += int(unknown_unit)
             if source_shape != tuple(image.shape) or not np.allclose(source_affine, image.affine, atol=AFFINE_ATOL, rtol=0):
                 reordered_n += 1
-            overlap_labels, overlap_counts = np.unique(atlas_data[lesion], return_counts=True)
-            overlaps = {int(k): int(v) for k, v in zip(overlap_labels, overlap_counts)}
-            covered = lesion_count - overlaps.get(0, 0)
+            if channel_masks is not None:
+                overlap_counts = np.count_nonzero(channel_masks[lesion], axis=0)
+                overlaps = {index+1: int(count) for index, count in enumerate(overlap_counts)}
+                covered = int(np.count_nonzero(atlas_data[lesion]))
+            else:
+                overlap_labels, overlap_counts = np.unique(atlas_data[lesion], return_counts=True)
+                overlaps = {int(k): int(v) for k, v in zip(overlap_labels, overlap_counts)}
+                covered = lesion_count - overlaps.get(0, 0)
             no_coverage_n += int(covered == 0)
             partial_coverage_n += int(0 < covered < lesion_count)
             coverage.append(covered / lesion_count)
@@ -205,6 +234,7 @@ def analyse_masks(mapping: dict[str, str], atlas: dict, min_overlap_ml: float = 
         "complete_atlas_overlap_n": n - no_coverage_n - partial_coverage_n,
         "covered_voxels_total": covered_voxels_total, "lesion_voxels_total": lesion_voxels_total,
         "pooled_covered_fraction": covered_voxels_total / lesion_voxels_total if lesion_voxels_total else None,
+        "coverage_rule": "union_of_all_positive_ROI_voxels; overlapping_ROI_voxels_count_once",
     }
     for name, values in (("patient_coverage_fraction", coverage), ("lesion_volume_ml", lesion_volumes)):
         coverage_summary[name] = ({"min": float(np.min(values)), "q25": float(np.quantile(values, .25)),

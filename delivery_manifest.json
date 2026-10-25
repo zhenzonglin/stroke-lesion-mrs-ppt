@@ -1,23 +1,27 @@
 {
   ".gitattributes": {
-    "bytes": 190,
-    "sha256": "a341a4d964c3d7ca9842c96a9c430f2897eeeddd59eb2f63a21ddcb7e432f6f9"
+    "bytes": 220,
+    "sha256": "70a5f8332ed89a310bccc3fb0060c2f3c07f4c5dd8de352bfa9b5f18da4667f4"
   },
   ".gitignore": {
-    "bytes": 239,
-    "sha256": "ef2e0ad756227fa475194eecc36e7b0d4a72087c8de446e6469618ab44027b06"
+    "bytes": 314,
+    "sha256": "b08c46a2bdc9eab5a4efd91ad9234a651899c364cb8ce3833ebbc733ee41db83"
+  },
+  "README.md": {
+    "bytes": 7599,
+    "sha256": "ce41ab3012837b0c7ee06ffa02c06ffaf31697eb12ea771a5dd8fb9736479999"
   },
   "atlas/CC_BY_SA_4_legalcode.txt": {
     "bytes": 20138,
     "sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5"
   },
-  "atlas/display_MNI9_HObrainstem_2mm.nii.gz": {
-    "bytes": 52894,
-    "sha256": "bcb8c54bf59c85296c6fea5cfdb04c3e698713e3c15038fe4289eb33b3d1bd51"
-  },
   "atlas/FSL_license_original.html": {
     "bytes": 95772,
     "sha256": "1260bd30fdff9fe1e750a76a7cb1b1129ea549cba9ae55fed021ad6bb9b08742"
+  },
+  "atlas/display_MNI9_HObrainstem_2mm.nii.gz": {
+    "bytes": 52894,
+    "sha256": "bcb8c54bf59c85296c6fea5cfdb04c3e698713e3c15038fe4289eb33b3d1bd51"
   },
   "atlas/labels.tsv": {
     "bytes": 837,
@@ -43,33 +47,129 @@
     "bytes": 26999,
     "sha256": "26d72953bf17b2bebda9775e21dfd3177ed2dfa5ecf2f55c3a3ff64023c998e5"
   },
+  "atlas/v2/display_MNI_HO_JHU_2mm.nii.gz": {
+    "bytes": 57253,
+    "sha256": "c1cf6e2aac27e886faa63dedb573ad4c507fe6dfcda10aa4ef65afb57da1681e"
+  },
+  "atlas/v2/labels.tsv": {
+    "bytes": 778,
+    "sha256": "264b51fd1cdce61455a6a4a3849429ab64ef5d8bcfcef50bbb8ff0d001aefa8b"
+  },
+  "atlas/v2/provenance.json": {
+    "bytes": 8383,
+    "sha256": "f9fa442c928bd6679b54d39bae454ca62047ecab21cf4dea8e13ebc44f7c5b2c"
+  },
+  "atlas/v2/roi_manifest.json": {
+    "bytes": 6442,
+    "sha256": "1e8eb3785ab2f75000d56883a599a4c1b4064070b71d2562f17f6afe3beae031"
+  },
+  "atlas/v2/roi_masks/basal_ganglia.nii.gz": {
+    "bytes": 6868,
+    "sha256": "d5ec5ee02dfb667fe60e4dbb95ab7e23475fa16f555efde1849199caa0701165"
+  },
+  "atlas/v2/roi_masks/brainstem.nii.gz": {
+    "bytes": 5709,
+    "sha256": "a43787d29cd92140dfb84bbf3309109ab2f01d7dc1f17c84cfac52862e0d8da6"
+  },
+  "atlas/v2/roi_masks/centrum_semiovale.nii.gz": {
+    "bytes": 12176,
+    "sha256": "a03cd778b73156068bafaa1e027e13d8ca706286c085619f13642bb50a85d3c7"
+  },
+  "atlas/v2/roi_masks/cerebellum.nii.gz": {
+    "bytes": 9460,
+    "sha256": "856b81f28ab5256654dbfae07b3e7339d944667f1d55e3c41f8ad27994ab4464"
+  },
+  "atlas/v2/roi_masks/corona_radiata.nii.gz": {
+    "bytes": 7445,
+    "sha256": "e70bf6cee00a4737985817bf88ff031f4c2e3ffca842d62027a02d0a0bc587dd"
+  },
+  "atlas/v2/roi_masks/corpus_callosum.nii.gz": {
+    "bytes": 7057,
+    "sha256": "78712ea709b95cad9a47e26dbd280ee9c47265bda77181f2e54607d11d22a010"
+  },
+  "atlas/v2/roi_masks/frontal_lobe.nii.gz": {
+    "bytes": 22359,
+    "sha256": "17160c2a22170c6cb784435a3be937cc6990ce3337cf57a015996e510c4e1a7a"
+  },
+  "atlas/v2/roi_masks/insula.nii.gz": {
+    "bytes": 6064,
+    "sha256": "6df0aab8380efc2b00c770d613ec7777bccb905b2de16488fb393b3457f83e66"
+  },
+  "atlas/v2/roi_masks/internal_capsule.nii.gz": {
+    "bytes": 6290,
+    "sha256": "78658cbb93a16b60ac1ac8914ca07c9a53369e8e091989bf5a4b7f102a6acff4"
+  },
+  "atlas/v2/roi_masks/occipital_lobe.nii.gz": {
+    "bytes": 10544,
+    "sha256": "a2ffb6ab162da449ca2bcc18a26d24a85e83c1b8925fbbe5aa4c2cfb121c8205"
+  },
+  "atlas/v2/roi_masks/parietal_lobe.nii.gz": {
+    "bytes": 15721,
+    "sha256": "6c1b3f391733262e71a908cb82ba7b8fc0ea84b69849acc8f613a05948c5e616"
+  },
+  "atlas/v2/roi_masks/temporal_lobe.nii.gz": {
+    "bytes": 13995,
+    "sha256": "71327e2e3fbeba6390fde7c2bd19aedab824d40df50dc31e0b9acb4b12900976"
+  },
+  "atlas/v2/roi_masks/thalamus.nii.gz": {
+    "bytes": 5181,
+    "sha256": "df1066ca6982ee067bd6491549c162d8bb6a27c460bc2f484398e3a0d88aee53"
+  },
+  "atlas/v2/roi_masks_MNI_HO_JHU_2mm.nii.gz": {
+    "bytes": 128190,
+    "sha256": "0ebffd8d146bd50b6c5fe3be02a61e412efa2572ef6b1e6a3deaf4f750aa87a7"
+  },
+  "atlas/v2/sources/HOsub.nii.gz": {
+    "bytes": 36627,
+    "sha256": "72140df8117250d915b753ca2937e078c917525d206e6185e2c1b4ab703fbfcc"
+  },
+  "atlas/v2/sources/HOsub.xml": {
+    "bytes": 1968,
+    "sha256": "4aa369944d514843a07b5e6febac0c844e76fc1980ab203a0021b083de699650"
+  },
+  "atlas/v2/sources/JHUlabels.nii.gz": {
+    "bytes": 9634,
+    "sha256": "79a3badf78e91c861a10ec5b8eb277e17e6558d39ef93bfd1e365e7464cb9ebf"
+  },
+  "atlas/v2/sources/JHUlabels.xml": {
+    "bytes": 4768,
+    "sha256": "84aaf30b7aa85a1f8cbb2b2afda368d9db515336dcc2b1df634e857dfa5b8218"
+  },
+  "atlas/v2/sources/MNI.xml": {
+    "bytes": 987,
+    "sha256": "fa9a73459a8b254776020e4f1da26727c08a63262cb17cd2bd664845d8c58e1b"
+  },
+  "atlas/v2/sources/MNI9.nii.gz": {
+    "bytes": 26999,
+    "sha256": "26d72953bf17b2bebda9775e21dfd3177ed2dfa5ecf2f55c3a3ff64023c998e5"
+  },
+  "atlas/v2/来源与定义.txt": {
+    "bytes": 2081,
+    "sha256": "1004f2c1be51b0281fee133bb2761288f28f92ea66ea61df97df4382745ca9e0"
+  },
   "atlas/来源与许可.txt": {
     "bytes": 1930,
     "sha256": "eab5dcf51a41c118866091d505bd469fbfe396de913cf773c165156e3e365205"
   },
   "build_display_atlas.py": {
-    "bytes": 4733,
-    "sha256": "94ffc76d933ece51a39d153e60beb4c84ab1f2b3f25344788c409edf50528dee"
+    "bytes": 19352,
+    "sha256": "df466022b00f25ddb3909f1ac7bfd5781282304b9d935bddb9c9bba1314594cd"
   },
   "config.example.json": {
-    "bytes": 815,
-    "sha256": "dbeb78fd1516d0b44575a5cc3080bd889ca305e7c685bd9ff88f833ff5124e4c"
+    "bytes": 879,
+    "sha256": "51278d67213681ca6258afbbf032031d6318339487fb7e5abc8b463aeae1dcc3"
   },
   "configure_workstation.py": {
-    "bytes": 2344,
-    "sha256": "e99f0f0523d5e4fdc0d0d886cf64b218acd7bd3cf1b6ffde2a9e0b8c1f2ad17e"
+    "bytes": 4158,
+    "sha256": "8eec0a9b9350826968ba251914e4ad29cb3d5063482dc7b7839b7d698de10017"
   },
   "inputs.py": {
     "bytes": 14258,
     "sha256": "f2291142746cacffaa7f5d1397f43a850077fee6f7013bd8a4ad61a044a082be"
   },
   "mrs_summary.py": {
-    "bytes": 11890,
-    "sha256": "a95482def13408010ba90a8046f4e75fd5ceedd1efd748863b56919a9d8fed28"
-  },
-  "README.md": {
-    "bytes": 4536,
-    "sha256": "b692805b85e3a1d4e371b6a371b0b4bdca3b6de3778f5e79cf959318258175e7"
+    "bytes": 14608,
+    "sha256": "d0e09ec3a55805f714fba69a9e01ea0d12579bfc2cb383df0ddd23855e1fdd5c"
   },
   "requirements-test.txt": {
     "bytes": 34,
@@ -80,35 +180,39 @@
     "sha256": "4f4986394ca65b2211fb04016b305e8b086a416fc046c8c83709c68a9c349916"
   },
   "roi_summary.py": {
-    "bytes": 13038,
-    "sha256": "a2b2a1c0fe96b4968b97aa1dcf9d5244dd13b9ac3f6677f2dd4b53c222d6ee2a"
+    "bytes": 15058,
+    "sha256": "320f1943bdda41c6f8ae16fb7dd2a5d146c3859f62f5d7fcc97f0f07c2194693"
   },
   "run_summary.py": {
-    "bytes": 16417,
-    "sha256": "8a976e5e472fc6cdb063874232cbe4b08847bfc34c54689bcbc83f811aa16d4a"
+    "bytes": 20361,
+    "sha256": "0069a63ca4f1e2044aaab10686ebe44103833b62cf0628a2c764fee5c6f12bea"
+  },
+  "test_atlas_v2.py": {
+    "bytes": 4838,
+    "sha256": "254d243250c02f4f17563068533507f2e5fee5e83fb70784b96809c5a9a5711b"
   },
   "test_inputs.py": {
     "bytes": 8130,
     "sha256": "8a46a03a78f9d6a12a4ae87fddea4a39319d3306d8d6a70eb208afe543264d80"
   },
   "test_mrs_summary.py": {
-    "bytes": 5834,
-    "sha256": "25a3b6697bafd67e33d502d9001b66925e8ac27bd5e2cdc4e034506acd6c0b61"
+    "bytes": 7467,
+    "sha256": "ab70f4d5dfcb7de75a565b585ce8ff4ae08a94c91339c42c94438235eacc7125"
   },
   "test_roi_summary.py": {
-    "bytes": 8020,
-    "sha256": "706a86a84778f31e452ec8913dc1fb7f0a3a47317bceb78b739e2b70ad13ad46"
+    "bytes": 11147,
+    "sha256": "5d2ddfae9e14d81b9aaaefb4040bed58e6d1ede9ec9bcae3e80b248f4b3640db"
   },
   "test_run_summary.py": {
-    "bytes": 8637,
-    "sha256": "f156c66bb1e4ea67aed1aea1b47f6e6276f59d6ec426060d658e669f5f2de7ea"
+    "bytes": 11885,
+    "sha256": "e391ab3843db31b04cb075ada6f82853ccaa1fea5e5291f6b0d5db639a28a589"
   },
   "工作站命令.txt": {
-    "bytes": 381,
-    "sha256": "00e8e52dc514e900781b65b52c98634ef817ca468e14863ff75b6f4fd2b0cae1"
+    "bytes": 398,
+    "sha256": "7cd98e7f6d3ef21d3ae6bbe4288f2b41d783d0dfcb554d92e5db040d042660d4"
   },
   "运行说明.txt": {
-    "bytes": 5880,
-    "sha256": "85c29c19736b0e9b20913f323fd8d271c48d4100994d20ab37620eb475cfe31a"
+    "bytes": 7057,
+    "sha256": "74acecd996164bec0f00f656513d44fe4fce78e2fe0c4828b1abfa16aaccbdec"
   }
 }

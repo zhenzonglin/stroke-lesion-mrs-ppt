@@ -16,7 +16,7 @@ import textwrap
 import zipfile
 
 from inputs import load_clinical, scan_masks
-from mrs_summary import MONTHS, STATES, derive_states, aggregate_groups
+from mrs_summary import MONTHS, STATES, OUTCOME_DEFINITIONS, derive_states, aggregate_groups
 from roi_summary import load_atlas, analyse_masks
 
 
@@ -71,6 +71,24 @@ def mrs_table(rows: list[dict], group: str) -> list[str]:
     return result
 
 
+def outcome_display_settings(cfg: dict) -> tuple[list[int], str] | None:
+    """只影响展示，所有访视与全部三个结局定义始终导出。"""
+    selected = cfg.get("display_outcome")
+    if selected is None:
+        return None
+    if not isinstance(selected, dict):
+        raise ValueError("display_outcome must be an object or null")
+    definition = selected.get("definition")
+    if definition not in {item[0] for item in OUTCOME_DEFINITIONS}:
+        raise ValueError("Unsupported display_outcome definition")
+    months = selected.get("months", [selected.get("month")])
+    if (not isinstance(months, list) or not months
+            or any(type(month) is not int or month not in MONTHS for month in months)
+            or len(months) != len(set(months))):
+        raise ValueError("display_outcome months must be distinct supported integer visits")
+    return sorted(months), definition
+
+
 def review_pages(report: dict) -> list[tuple[str, list[str]]]:
     sections = [("运行与定义", [
         "status: " + report["status"], "run: " + report["run_id"],
@@ -110,11 +128,33 @@ def review_pages(report: dict) -> list[tuple[str, list[str]]]:
             percent = "NA" if row["any_overlap_proportion"] is None else f"{100*row['any_overlap_proportion']:.2f}"
             lines.append(f"{row['roi_name']:<21} {row['any_overlap_n']:>6} {percent:>9} {row['n']:>11} {row['denominator_n']:>6}")
         lines += ["同一患者可属于多个ROI，不把脑区人数或比例相加。",
-                  "图谱为MNI9＋HO脑干的自定义展示分区，双侧合并；未覆盖比例另报。"]
+                  "图谱版本: " + report.get("atlas", {}).get("provenance", {}).get("version", "unspecified"),
+                  "独立ROI允许跨区体素重叠；覆盖率按所有ROI并集，未覆盖比例另报。"
+                  if report.get("atlas", {}).get("atlas_format") == "independent_binary_channels"
+                  else "图谱为MNI9＋HO脑干的自定义展示分区，双侧合并；未覆盖比例另报。"]
         sections.append(("脑区累及比例", lines))
     if "primary" in report:
         primary = report["primary"]
         names = {r["roi_id"]: r["roi_name"] for r in report["roi"]["roi_rows"]}
+        settings = outcome_display_settings(report["config"])
+        if settings and "outcome_rates" in primary:
+            months, definition = settings
+            title = next(label for key, label, _ in OUTCOME_DEFINITIONS if key == definition)
+            roi_rows = {row["roi_id"]: row for row in report["roi"]["roi_rows"]}
+            selected = {(row["group"], row["month"]): row for row in primary["outcome_rates"]
+                        if row["definition"] == definition}
+            for month in months:
+                lines = ["累及比例分母=全部有效非空掩膜；结局比例分母=该ROI当次有效mRS 0–6。",
+                         "ROI                  Lesion_n  Lesion%   Outcome_n/valid_n    Outcome%"]
+                for roi_id, roi_row in roi_rows.items():
+                    row = selected[(roi_id, month)]
+                    outcome = "NA" if row["proportion"] is None else f"{100*row['proportion']:.2f}"
+                    involvement = "NA" if roi_row["any_overlap_proportion"] is None else f"{100*roi_row['any_overlap_proportion']:.2f}"
+                    lines.append(f"{names[roi_id]:<21} {roi_row['any_overlap_n']:>7} {involvement:>8} "
+                                 f"{row['numerator_n']:>8}/{row['denominator_n']:<8} {outcome:>9}")
+                lines += ["每名患者在同一ROI只计一次，多个ROI之间可以重叠。",
+                          "死亡仍仅由mRS=6定义。3/12月源字段无6分时不能推断没有真实死亡。"]
+                sections.append((f"{month}个月脑图标注：{title}", lines))
         for group in primary["groups"]:
             title = "全体有效匹配患者" if group["group"] == "overall" else names[group["group"]]
             sections.append((f"{title} mRS分布 N={group['n']}", [
@@ -135,6 +175,8 @@ def review_pages(report: dict) -> list[tuple[str, list[str]]]:
         "精确PPT数值：优先下载并发送本次share.zip，只有群体汇总，不含患者ID。",
         "share/ppt_data.json：总体及ROI mRS分布、转移与阈值敏感性版本。",
         "share/*.csv：可直接查看的脑区统计、mRS与转移表。",
+        *(["share/roi_outcome_rates.csv：各ROI全部访视的2–5、2–6、2–3结局分子、有效分母与比例。"]
+          if "roi_outcome_rates" in report else []),
         "private/包含受试者ID和病灶路径，仅留在工作站，不在share.zip内。",
     ]))
     pages = []
@@ -173,6 +215,7 @@ def execute(config_path: Path, output: Path | None = None) -> tuple[dict, Path]:
         raise ValueError("This command supports only the confirmed mRS6-only, no carry-forward definition")
     if cfg.get("primary_membership") != "any_positive_overlap" or cfg.get("diagnosis_filter") is not None:
         raise ValueError("Unsupported cohort or primary ROI rule; do not silently alter the requested population")
+    outcome_display_settings(cfg)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     out = output if output is not None else base / cfg.get("output_root", "outputs") / run_id
     out.mkdir(parents=True, exist_ok=False)
@@ -204,7 +247,8 @@ def execute(config_path: Path, output: Path | None = None) -> tuple[dict, Path]:
                 def resolve(value):
                     path=Path(value)
                     return path if path.is_absolute() else base/path
-                atlas = load_atlas(resolve(cfg["atlas_path"]), resolve(cfg["atlas_labels"]))
+                atlas = load_atlas(resolve(cfg["atlas_path"]), resolve(cfg["atlas_labels"]),
+                                   cfg.get("atlas_format", "discrete_labels"))
                 provenance=json.loads(resolve(cfg["atlas_provenance"]).read_text(encoding="utf-8"))
                 if atlas["sha256"] != provenance["atlas_sha256"] or atlas["labels_sha256"] != provenance["labels_sha256"]:
                     raise ValueError("Frozen atlas or label checksum mismatch")
@@ -230,6 +274,15 @@ def execute(config_path: Path, output: Path | None = None) -> tuple[dict, Path]:
                         "TIA_2":sum(v for k,v in diagnoses.items() if k in {"2","2.0"}),
                         "other_or_missing":sum(v for k,v in diagnoses.items() if k not in {"1","1.0","2","2.0"})}
                     report.update(primary=primary,sensitivity=sensitivity,mrs_audit=audit)
+                    roi_names = {row["roi_id"]: row["roi_name"] for row in roi["roi_rows"]}
+                    roi_counts = {row["roi_id"]: row for row in roi["roi_rows"]}
+                    outcome_rates = [{**row, "roi_name": roi_names[row["group"]],
+                        "lesion_n": roi_counts[row["group"]]["any_overlap_n"],
+                        "lesion_denominator_n": roi["valid_n"],
+                        "lesion_proportion": roi_counts[row["group"]]["any_overlap_proportion"]}
+                        for row in primary["outcome_rates"] if row["group"] != "overall"]
+                    report["roi_outcome_rates"] = outcome_rates
+                    csv_rows(share/"roi_outcome_rates.csv", outcome_rates)
                     csv_rows(private/"derived_states.csv",[{"patient_id":i,**{f"m{m}":s for m,s in visits.items()}} for i,visits in sorted(states.items())])
                     report["status"]="COMPLETED_WITH_FLAGS" if roi["excluded_n"] or audit["has_conflicts"] else "COMPLETED"
                     if roi["excluded_n"]:
@@ -237,7 +290,8 @@ def execute(config_path: Path, output: Path | None = None) -> tuple[dict, Path]:
                     if audit["has_conflicts"]:
                         report["issues"].append("Alive mRS after prior mRS6 is retained as conflict, not a recovery transition")
                     for title, result in (("primary",primary),("sensitivity",sensitivity)):
-                        for table in ("distributions","transitions","state3_distributions","state3_transitions","change"):
+                        for table in ("distributions","transitions","state3_distributions","state3_transitions","change",
+                                      "recovery_distributions","outcome_rates"):
                             csv_rows(share/f"{title}_{table}.csv",result[table])
                 csv_rows(share/"roi_summary.csv",roi["roi_rows"])
     except Exception as exc:

@@ -1,0 +1,14 @@
+label_id	roi_name	roi_name_zh	source
+1	Basal Ganglia	基底节	MNI Caudate + Putamen union HO Pallidum
+2	Cerebellum	小脑	Unchanged v1 label 2
+3	Frontal Lobe	额叶	Unchanged v1 label 3
+4	Insula	岛叶	Unchanged v1 label 4
+5	Occipital Lobe	枕叶	Unchanged v1 label 5
+6	Parietal Lobe	顶叶	Unchanged v1 label 6
+7	Internal Capsule	内囊	JHU ICBM-DTI-81 labels 17,18,19,20,21,22
+8	Temporal Lobe	颞叶	Unchanged v1 label 8
+9	Thalamus	丘脑	Unchanged v1 label 9
+10	Brainstem	脑干	Unchanged v1 label 10
+11	Corona Radiata	放射冠	JHU ICBM-DTI-81 labels 23,24,25,26,27,28
+12	Centrum Semiovale	半卵圆中心（操作性定义）	Operational HO white matter above lateral ventricle roof excluding JHU CC
+13	Corpus Callosum	胼胝体	JHU ICBM-DTI-81 labels 3,4,5

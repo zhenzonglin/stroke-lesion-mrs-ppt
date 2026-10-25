@@ -15,7 +15,8 @@ import zipfile
 import nibabel as nib
 import numpy as np
 
-from run_summary import execute
+from run_summary import execute, review_pages, outcome_display_settings
+from configure_workstation import create_config
 from test_inputs import reader
 
 
@@ -157,6 +158,52 @@ class EndToEndSummaryTest(unittest.TestCase):
         self.assertTrue(all(row["proportion"] is None for row in report["roi"]["roi_rows"]))
         self.assert_share_has_only_aggregate(output)
         self.assert_source_preservation()
+
+    def test_v2_overlapping_channels_and_all_visit_outcome_csv(self):
+        masks = np.stack([self.atlas == 1, (self.atlas == 1) | (self.atlas == 2)], axis=3).astype(np.uint8)
+        self.write_image(self.atlas_path, masks)
+        self.labels.write_text("label_id\troi_name\n1\tBasal Ganglia\n2\tInternal Capsule\n", encoding="utf-8")
+        self.provenance.write_text(json.dumps({"atlas_sha256": sha(self.atlas_path),
+            "labels_sha256": sha(self.labels), "version": "synthetic_v2"}), encoding="utf-8")
+        self.cfg.update(atlas_format="independent_binary_channels",
+                        display_outcome={"definition": "mrs_2_6", "months": [3, 12, 24, 36, 48, 60]})
+        report, output, _ = self.run_execute()
+        self.assertEqual(report["status"], "COMPLETED", report["issues"])
+        self.assertEqual(report["atlas"]["atlas_format"], "independent_binary_channels")
+        self.assertEqual(report["roi"]["coverage_summary"]["covered_voxels_total"], 35)
+        self.assertEqual([r["any_overlap_n"] for r in report["roi"]["roi_rows"]], [2, 2])
+        self.assertEqual(len(report["roi_outcome_rates"]), 2*6*3)
+        selected = [r for r in report["roi_outcome_rates"] if r["group"] == "roi_0001"
+                    and r["month"] == 24 and r["definition"] == "mrs_2_6"][0]
+        self.assertEqual((selected["numerator_n"], selected["denominator_n"], selected["total_n"]), (0, 1, 2))
+        self.assertEqual(selected["lesion_n"], 2)
+        self.assertEqual(selected["lesion_denominator_n"], 3)
+        self.assertEqual(selected["death6_n"], 0)  # 既往6分后缺失不得前填死亡。
+        self.assertTrue((output/"share/roi_outcome_rates.csv").is_file())
+        self.assertTrue((output/"share/primary_recovery_distributions.csv").is_file())
+        pages = review_pages(report)
+        self.assertEqual(sum("个月脑图标注" in title for title, _ in pages), 6)
+        self.assert_share_has_only_aggregate(output)
+        self.assert_source_preservation()
+
+    def test_configuration_v1_preserved_v2_explicit_and_exclusive(self):
+        v1_path = self.root/"config.v1.local.json"
+        v1 = create_config(self.root, v1_path)
+        self.assertEqual(v1["atlas_format"], "discrete_labels")
+        self.assertIsNone(v1["display_outcome"])
+        self.assertIn("display_MNI9_HObrainstem_2mm", v1["atlas_path"])
+        v2 = create_config(self.root, self.root/"config.v2.local.json", atlas_version="v2")
+        self.assertEqual(v2["atlas_format"], "independent_binary_channels")
+        self.assertTrue(Path(v2["atlas_path"]).is_absolute())
+        self.assertEqual(outcome_display_settings(v2), ([3, 12, 24, 36, 48, 60], "mrs_2_6"))
+        before = v1_path.read_bytes()
+        with self.assertRaises(FileExistsError):
+            create_config(self.root, v1_path, atlas_version="v2")
+        self.assertEqual(before, v1_path.read_bytes())
+        with self.assertRaises(ValueError):
+            create_config(self.root, self.root/"bad.json", display_month=60)
+        with self.assertRaises(ValueError):
+            outcome_display_settings({"display_outcome": {"months": [3, 3], "definition": "mrs_2_6"}})
 
 
 if __name__ == "__main__":

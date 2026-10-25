@@ -1,14 +1,15 @@
 (
 set -e
-cd /data/usersdir/linzhenzong
-git clone https://github.com/zhenzonglin/stroke-lesion-mrs-ppt.git
-cd stroke-lesion-mrs-ppt
+cd /data/usersdir/linzhenzong/stroke-lesion-mrs-ppt
+git pull --ff-only
 
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate wmh-hcy
 export PYTHONUTF8=1
 export PYTHONIOENCODING=utf-8
 
-python configure_workstation.py --data-root /data/usersdir/linzhenzong
-python run_summary.py --config config.local.json
+if [ ! -f config.v2.local.json ]; then
+    python configure_workstation.py --data-root /data/usersdir/linzhenzong --atlas-version v2
+fi
+python run_summary.py --config config.v2.local.json
 )

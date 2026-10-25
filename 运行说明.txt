@@ -1,5 +1,20 @@
-急性梗死ROI与长期mRS汇总 v2
+急性梗死ROI与长期mRS汇总：13区图谱版本v2
 2026-10-25
+
+本次更新
+工作站已有仓库时先git pull --ff-only，再运行：
+python configure_workstation.py --data-root /data/usersdir/linzhenzong --atlas-version v2
+python run_summary.py --config config.v2.local.json
+已有config.v2.local.json时直接运行第二条，不覆盖配置。
+基底节=尾状核+壳核+苍白球的体素并集，丘脑单列。
+新增内囊、放射冠、半卵圆中心和胼胝体，总计13区。
+统计用独立二值通道，允许跨ROI重叠；总体覆盖按并集。
+半卵圆中心为HO白质中MNI z>28mm并排除胼胝体的操作性近似，
+不是JHU原生标签或经过验证的标准分割。完整定义见atlas/v2/provenance.json。
+默认六页脑图标注分别对应3、12、24、36、48、60月。
+残疾/死亡率=mRS2-6人数/该ROI本次有效mRS0-6人数。
+roi_outcome_rates.csv给出分子、有效分母、总N与死亡数；不需上传患者记录。
+以下原流程说明仍适用于v1，显式选择v2才启用新图谱。
 
 此次依据已确认信息配置：
 病灶目录 /data/usersdir/linzhenzong/Substain/C3_LesionMNI2mm
@@ -80,6 +95,8 @@ NO_VALID_MASKS：没有通过格式/网格检查的匹配掩膜，不能当作0�
 FAILED：见private/failure.txt；不要使用该次结果制作正式PPT。
 
 之后的PPT
-先总体mRS趋势，再10区脑图标注n/N，点击区域进入同格式趋势并可返回。
-图中死亡应标“mRS=6”，缺失单列；这不是完整死亡率或因果效应。
+首页同一组曲线承载恢复示意与总体实际分组百分比，逐段从左到右绘制。
+3、12、24、36、48、60月各有一页13区脑图，列累及比例与残疾/死亡率。
+不展示各ROI功能分组曲线，不画缺失类别，但原始核对表保留缺失记录。
+图中死亡按mRS=6；这不是完整死亡率或因果效应。
 主汇总为描述性，不进行显著性检验或按P值挑选脑区。

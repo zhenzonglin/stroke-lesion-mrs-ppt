@@ -1,0 +1,27 @@
+V2 atlas sources and adaptation notice
+
+Frozen source: FSL fsl-data_atlases 2103.0-0, official package URL and SHA256 in provenance.json.
+MNI Structural Atlas: Jack Lancaster, UTHSCSA; original labels from the McConnell Brain Imaging Centre, MNI.
+Harvard-Oxford Subcortical Atlas: Harvard Center for Morphometric Analysis and contributors credited by FSL.
+JHU ICBM-DTI-81 White-Matter Labels: Susumu Mori and colleagues, Johns Hopkins University; ICBM DTI workgroup.
+References: Mori et al. MRI Atlas of Human White Matter (2005); FSL dataset documentation.
+https://fsl.fmrib.ox.ac.uk/fsl/docs/other/datasets.html
+https://fsl.fmrib.ox.ac.uk/fsl/docs/license.html
+
+The source atlas license terms remain applicable. Harvard-Oxford is CC BY-SA 4.0.
+JHU atlas data may not be used commercially without permission from its copyright holder
+under the FSL-distributed atlas terms. This bundle does not grant such permission.
+The source FSL license page and CC BY-SA 4.0 legal text are retained in the parent atlas directory.
+This academic research bundle does not assert commercial-use rights or endorsement by source institutions.
+
+Modifications: bilateral unions; caudate/putamen/pallidum merged; independent internal capsule,
+corona radiata, corpus callosum and an explicitly operational centrum semiovale channel added.
+Centrum semiovale is HO cerebral white matter above the highest HO lateral-ventricle voxel centre,
+excluding JHU corpus callosum. It is not an official atlas label, not equivalent to superior corona
+radiata, not a validated segmentation, and does not specifically remove cortical U-fibres.
+Anatomical-location reference only: https://doi.org/10.3389/fneur.2022.888511
+The source study's acquisition, slice selection and segmentation are not reproduced here.
+
+Statistics must use roi_masks_MNI_HO_JHU_2mm.nii.gz with independent_binary_channels mode.
+display_MNI_HO_JHU_2mm.nii.gz is a lossy priority rendering aid only.
+Original v1 masks remain unchanged. No patient images or clinical records were used to construct these atlas assets.

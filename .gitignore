@@ -15,6 +15,9 @@ config.*.local.json
 *.nii.gz
 !atlas/*.nii.gz
 !atlas/sources/*.nii.gz
+!atlas/v2/*.nii.gz
+!atlas/v2/roi_masks/*.nii.gz
+!atlas/v2/sources/*.nii.gz
 *.zip
 *.log
 .env

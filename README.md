@@ -2,7 +2,48 @@
 
 只读提取急性梗死病灶的ROI累及比例，以及全体可匹配患者和各ROI人群的长期mRS分布、相邻随访转移。输出用于后续交互式PowerPoint制作；本仓库目前不包含PPT生成器，也不包含患者数据或真实统计结果。
 
-## 工作站首次运行
+## 已有工作站：更新13区与六次残疾/死亡率
+
+v2将尾状核、壳核和苍白球合并为基底节，丘脑单列，增加内囊、放射冠、半卵圆中心和胼胝体。六次随访为3、12、24、36、48、60个月。脑图旁的**残疾/死亡率 = 该ROI人群该次mRS 2–6人数 / 该次有效mRS 0–6人数**，各次有效人数可以不同。mRS 6仍为死亡。
+
+```bash
+cd /data/usersdir/linzhenzong/stroke-lesion-mrs-ppt
+git pull --ff-only
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate wmh-hcy
+export PYTHONUTF8=1
+export PYTHONIOENCODING=utf-8
+python configure_workstation.py --data-root /data/usersdir/linzhenzong --atlas-version v2
+python run_summary.py --config config.v2.local.json
+```
+
+配置写入独立的`config.v2.local.json`，保留旧配置及旧结果。如果v2配置已经生成，只需直接运行最后一条命令。每次统计新建输出目录；新版汇总要重新读取掩膜，不能把尾状核与壳核人数相加得到基底节人数。
+
+默认生成六页“脑图标注”表，分别列出ROI累及比例、mRS 2–6人数、有效mRS人数及残疾/死亡率。回传当次`share.zip`即可补全PPT；仅截图时请包含六页脑图标注、影像排除与图谱覆盖检查。
+
+### v2脑区定义
+
+| 脑区 | 定义 |
+| --- | --- |
+| 基底节 | 原MNI尾状核、壳核与Harvard–Oxford双侧苍白球的体素并集 |
+| 内囊 | JHU双侧前肢、后肢及豆状核后部 |
+| 放射冠 | JHU双侧前部、上部及后部 |
+| 胼胝体 | JHU膝部、体部及压部 |
+| 半卵圆中心 | 操作性近似：Harvard–Oxford双侧大脑白质中，MNI z高于该图谱侧脑室最高体素中心（z > 28 mm），排除JHU胼胝体 |
+
+其余8区（额叶、顶叶、颞叶、枕叶、岛叶、丘脑、小脑、脑干）与v1逐体素一致。MNI脑叶分区是宏观结构标签，不能称为只含灰质的组织掩膜。半卵圆中心不是JHU原生标签，上述定义不是经过独立验证的标准分割；空间依据与完整构建记录见`atlas/v2/provenance.json`。
+
+统计使用13个独立二值通道，允许不同ROI体素和患者重叠。全图谱覆盖率按所有通道的并集计算，区域比例不可相加。`display_MNI_HO_JHU_2mm.nii.gz`仅用于画图，其覆盖优先级不会改变统计掩膜。v1默认配置及资源保留，显式`--atlas-version v2`才选择新图谱。
+
+### 新增分享表
+
+- `roi_outcome_rates.csv`：每个ROI、每次随访的2–5、2–6、2–3三种结局定义，均附分子、有效分母、总N与mRS 6人数；PPT选择2–6。
+- `primary_recovery_distributions.csv`及敏感性对应表：0–1恢复良好、2–3功能残疾、4–6功能丧失，比例分母为当次有效mRS记录。
+- `ppt_data.json`保留原始mRS计数、规则、图谱指纹及新增聚合表。旧`state3`的0–2/3–5/6定义不改名混用。
+
+上述类别均为本次展示约定。缺失、非法或冲突记录不进入该次结局比例分母，不作插补；在原始核对表中保留。
+
+## 工作站首次运行（v1原流程）
 
 在已有 `wmh-hcy` 环境的工作站执行：
 

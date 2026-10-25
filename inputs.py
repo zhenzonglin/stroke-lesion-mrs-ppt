@@ -45,8 +45,11 @@ def _id(value: Any, numeric: bool, width: int | None) -> tuple[str | None, str |
     return None, "invalid"
 
 
-def load_clinical(config: dict) -> tuple[dict[str, dict], dict]:
-    """读取已指定的两个SAS并保留ID并集；失败时返回空记录和阻断审计。"""
+def load_clinical(config: dict, *, include_discharge_mrs: bool = False) -> tuple[dict[str, dict], dict]:
+    """读取两个SAS并保留ID并集；显式请求时才从early读取出院D_MRS。"""
+    required_by_source = dict(SOURCE_FIELDS)
+    if include_discharge_mrs:
+        required_by_source["early"] = (*required_by_source["early"], "D_MRS")
     audit = {"clinical_allowed": False, "numeric_id_compatible": False,
              "source_files": {}, "sources": {}, "errors": [],
              "id_rule": "exact_character_or_integer_numeric_explicit_width",
@@ -67,7 +70,7 @@ def load_clinical(config: dict) -> tuple[dict[str, dict], dict]:
         audit["errors"].append({"stage": "dependency", "error": "pyreadstat_unavailable"})
         return {}, audit
     payloads = {}
-    for source, required in SOURCE_FIELDS.items():
+    for source, required in required_by_source.items():
         path = Path(source_files[source]).expanduser().resolve()
         audit["source_files"][source] = str(path)
         info = {"path": str(path), "required_fields": list(required), "schema": {},

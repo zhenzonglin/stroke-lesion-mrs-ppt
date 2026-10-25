@@ -1,6 +1,16 @@
 急性梗死ROI与长期mRS汇总：13区图谱版本v2
 2026-10-25
 
+当前轨迹入口：只读SAS，不检查病灶文件
+python run_clinical_trajectories.py --config config.v2.local.json
+人群1：D_DIAG=1的全体缺血性卒中；不因出院mRS缺失或0-1分而排除。
+人群2：上述人群中D_MRS为有效整数2-6的出院致残性缺血性卒中。
+使用原配置里的SAS路径；不使用病灶目录、图谱或既往影像输出目录。
+各次以有效mRS0-6为分母，0-1/2-3/4-6三组构成100%；缺失不补。
+新输出outputs/clinical_trajectories_<UTC>/share.zip，含两个人群的六次轨迹数据。
+两页PPT共用全影像队列脑图，脑图与SAS轨迹分别标明分母。
+下面的影像统计入口仅用于脑区比例，不是本次临床轨迹的前置条件。
+
 出院时致残性缺血性卒中亚组（新增独立入口）
 python supplement_discharge_cohort.py --run-dir outputs/<原v2运行时间戳>
 来源必须是原13区全体队列运行，保留其private目录；不使用deep_union补统计目录。

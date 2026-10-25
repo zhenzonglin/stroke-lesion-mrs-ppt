@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from inputs import _anonymous_pattern, load_clinical, scan_masks
+from inputs import SOURCE_FIELDS, _anonymous_pattern, load_clinical, scan_masks
 
 
 class Column(list):
@@ -51,10 +51,10 @@ class InputTests(unittest.TestCase):
         }
         self.config = {"source_files": {"early": str(self.root / "early.sas7bdat"), "late": str(self.root / "late.sas7bdat")}}
 
-    def load(self):
+    def load(self, **kwargs):
         observed = []
         with patch.dict(sys.modules, {"pyreadstat": reader(self.specs, observed)}):
-            records, audit = load_clinical(self.config)
+            records, audit = load_clinical(self.config, **kwargs)
         return records, audit, observed
 
     def mask(self, relative):
@@ -78,6 +78,48 @@ class InputTests(unittest.TestCase):
         self.assertTrue(audit["numeric_id_compatible"])
         self.assertTrue(audit["clinical_allowed"])
         self.assertFalse(any("DEATH" in name for name in columns))
+
+    def test_discharge_mrs_is_read_only_when_requested(self):
+        original = dict(SOURCE_FIELDS)
+        self.specs["early.sas7bdat"]["data"]["d_mrs"] = [2., 6.]
+        self.specs["early.sas7bdat"]["data"]["D_DEATH"] = [2, 1]
+        records, audit, columns = self.load()
+        self.assertTrue(audit["clinical_allowed"])
+        self.assertNotIn("D_MRS", records["1"])
+        self.assertNotIn("d_mrs", columns)
+        records, audit, columns = self.load(include_discharge_mrs=True)
+        self.assertTrue(audit["clinical_allowed"])
+        self.assertEqual(records["1"]["D_MRS"], 2.)
+        self.assertEqual(records["2"]["D_MRS"], 6.)
+        self.assertNotIn("D_MRS", records["3"])
+        self.assertIn("D_MRS", audit["sources"]["early"]["required_fields"])
+        self.assertEqual(audit["sources"]["early"]["schema"]["D_MRS"]["actual"], "d_mrs")
+        self.assertNotIn("D_MRS", audit["sources"]["late"]["required_fields"])
+        self.assertIn("d_mrs", columns)
+        self.assertFalse(any("DEATH" in name.upper() for name in columns))
+        self.assertEqual(SOURCE_FIELDS, original)
+        _, default_audit, default_columns = self.load()
+        self.assertNotIn("D_MRS", default_audit["sources"]["early"]["required_fields"])
+        self.assertNotIn("d_mrs", default_columns)
+
+    def test_missing_discharge_mrs_blocks_only_requested_read(self):
+        records, audit, _ = self.load(include_discharge_mrs=True)
+        self.assertEqual(records, {})
+        self.assertFalse(audit["clinical_allowed"])
+        self.assertEqual(audit["sources"]["early"]["missing_fields"], ["D_MRS"])
+        records, audit, _ = self.load()
+        self.assertTrue(audit["clinical_allowed"])
+        self.assertEqual(set(records), {"1", "2", "3"})
+
+    def test_discharge_mrs_requires_unique_case_insensitive_column(self):
+        self.specs["early.sas7bdat"]["data"].update(D_MRS=[2., 6.], d_mrs=[3., 5.])
+        records, audit, columns = self.load(include_discharge_mrs=True)
+        self.assertEqual(records, {})
+        self.assertFalse(audit["clinical_allowed"])
+        self.assertEqual(audit["sources"]["early"]["duplicate_columns"], ["D_MRS"])
+        self.assertFalse(any(name.upper() == "D_MRS" for name in columns))
+        _, default_audit, _ = self.load()
+        self.assertTrue(default_audit["clinical_allowed"])
 
     def test_duplicate_or_missing_sas_id_blocks(self):
         self.specs["early.sas7bdat"]["data"]["code_n"] = [1., 1.]

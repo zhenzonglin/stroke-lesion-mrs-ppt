@@ -8,8 +8,6 @@ conda activate wmh-hcy
 export PYTHONUTF8=1
 export PYTHONIOENCODING=utf-8
 
-if [ ! -f config.v2.local.json ]; then
-    python configure_workstation.py --data-root /data/usersdir/linzhenzong --atlas-version v2
-fi
-python run_summary.py --config config.v2.local.json
+# 直接按SAS构建两组缺血性卒中轨迹，不读取或核查影像。
+python run_clinical_trajectories.py --config config.v2.local.json
 )
